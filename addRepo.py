@@ -90,13 +90,17 @@ def check_HTTP_status_code(webpage_var: str) -> str:
     print(f"{sb} Found {len(items)} items!")
 
     # Check how many items have been return and, in function of that, display a certain message
-    if len(items) != 1:
+    if len(items) > 1:
         print(f"Warning! More than 1 items found. Found {len(items)} items.")
         print("This script will only return the first item found. However, ", end='')
         print("all the items found are:")
 
     if len(items) == 1:
         print(f"{sb} Text found!\n")
+
+    if len(items) == 0:
+        print(f"{sb} No description found")
+        return 'NO DESCRIPTION'
 
     fixed_description = []
 
