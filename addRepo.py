@@ -41,12 +41,12 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     # Add an argument called "--flag" with action "store_true"
-    parser.add_argument("-w", "--webpage", type=str, help="Webpage to extract the content.")
-    parser.add_argument("-c", "--class", type=str, default="f4 my-3",
-                        help="HTML class containing the text of our interest")
+    parser.add_argument("-w", "--webpage", type=str, help="Webpage to extract the content. For example, a Github repository url (without .git at the end of it)")
+    parser.add_argument("-c", "--clone", action="store_true",
+                        help="Use this flag if you want to, additionally, clone the repository on your machine.")
     parser.add_argument("-f", "--filename", type=str, default="repositories.txt",
-                        help="File to write the content extracted. If not specified, it will be saved in 'repositories.txt' as default")
-    parser.add_argument("-a", "--add", action="store_true", help="Use this flag if you want to clone the repository to your machine")
+                        help="File to write the content extracted. If not specified, it will be saved in './repositories.txt' as default")
+    parser.add_argument("-x", "--html-class", type=str, default="f4 my-3", help="HTML class containing the description for the repository (default in Github: 'f4-my3')")
 
     # Parse the command-line arguments
     args = parser.parse_args(sys.argv[1:])
@@ -68,7 +68,7 @@ def check_arguments_length(parser_variable) -> None:
         sys.exit(1)
 
 
-def check_HTTP_status_code(webpage_var: str) -> str:
+def check_HTTP_status_code(webpage_var: str, html_class_var: str) -> str:
     """
     Check HTTP status code for a web request. If it exists return its content, else executes an error
     """
@@ -86,22 +86,22 @@ def check_HTTP_status_code(webpage_var: str) -> str:
     soup = BeautifulSoup(r.text, "lxml")
 
     # Find all the div elements with the class "item"
-    items = soup.find_all(class_="f4 my-3")
-    print(f"{sb} Found {len(items)} items!")
+    items = soup.find_all(class_=html_class_var)
 
     # Check how many items have been return and, in function of that, display a certain message
     if len(items) > 1:
-        print(f"Warning! More than 1 items found. Found {len(items)} items.")
-        print("This script will only return the first item found. However, ", end='')
+        print(f"{sb}Warning! More than 1 items found. Found {len(items)} items.")
+        print("{sb}This script will only return the first item found. However, ", end='')
         print("all the items found are:")
 
     if len(items) == 1:
-        print(f"{sb} Text found!\n")
+        print(f"{sb} Description found!\n")
 
     if len(items) == 0:
         print(f"{sb} No description found")
         return 'NO DESCRIPTION'
 
+    # Create a simple array that will store the description string
     fixed_description = []
 
     # Print the text of each items
@@ -115,7 +115,12 @@ def check_HTTP_status_code(webpage_var: str) -> str:
             else:
                 description += word
         # Print the 'rebuilt' description
-        print(f'{whitespaces}{colors["RED"]}{i+1}) "{description}"{colors["NC"]}')
+        if len(items) == 1:
+            print(f'{colors["RED"]}[{colors["YELLOW"]}+{colors["RED"]}] {colors["L_GREEN"]}"{description}"{colors["NC"]}')
+            fixed_description.append(description)
+            break
+        else:
+            print(f'{whitespaces}{colors["RED"]}{i+1}) "{description}"{colors["NC"]}')
         fixed_description.append(description)
     print("")
     return fixed_description[0]
@@ -135,8 +140,8 @@ def check_file_to_write(args_var, description: str) -> None:
 
     # If the file provided by the user does not exists, create a new one
     if not file_path.exists():
-        print(f"{sb} {colors['RED']}Warning{colors['NC']}: {file_to_append} does not exist. ", end='')
-        create_file = input("Would you like to create {file_path.name} file? [Y/N]: ")
+        print(f"{sb} {colors['RED']}Warning{colors['NC']}: '{file_to_append}' does not exist. ", end='')
+        create_file = input(f"Would you like to create '{file_path.name}' file? {colors['YELLOW']}[Y/N]{colors['NC']}: ")
         if re.match(r"^y(es)?$", create_file, re.IGNORECASE): # re.IGNORECASE is case-insensitive, i.e., 'yes = YeS'
             with open(file_to_append, 'x') as f: # 'x' will raise an error if the file already exists
                 f.write(description_to_add)
@@ -171,9 +176,9 @@ def check_file_to_write(args_var, description: str) -> None:
 
 def clone_repo(args_var) -> None:
     """
-    Clone the repository if the user passed the flag '--add' or '-a'
+    Clone the repository if the user passed the flag '--clone' or '-c'
     """
-    if args_var.add:
+    if args_var.clone:
         print(f"{sb} Cloning {args_var.webpage}.git...")
         clone_command = subprocess.run(["git", "clone", f"{args_var.webpage}.git"])
         if clone_command.returncode == 0:
@@ -188,7 +193,7 @@ def main():
     MAIN
     """
     args = parse_args()
-    description_obtained = check_HTTP_status_code(args.webpage) 
+    description_obtained = check_HTTP_status_code(args.webpage, args.html_class) 
     check_file_to_write(args_var=args, description=description_obtained, )
     clone_repo(args_var=args)
     print(f"{sb} Done!")
