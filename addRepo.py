@@ -303,7 +303,7 @@ def main():
     header_obtained, language_obtained, description_obtained = check_HTTP_status_code(args, OS) 
 
     # Check if the user wants to write output on a file (default: True)
-    check_if_only_print_mode_is_enabled(args_var=args)
+    check_if_print_only_mode_is_enabled(args_var=args)
 
     # Ask to the user if wants to write the output shown above to the file
     ask_to_user_if_wants_to_write(args.filename)
