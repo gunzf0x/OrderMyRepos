@@ -172,7 +172,7 @@ def check_HTTP_status_code(args_var, OS):
         # Check if the description has a length that fits with the width of the current terminal
         one_terminal_line_width =  shutil.get_terminal_size()[0]
         if (len(description) + len(whitespaces) + len(sb) + len("Description:") + 4) >= one_terminal_line_width:
-                offset = ' ' * (len(whitespaces) + len(sb) + len("Description:") + 3)
+                offset = '\n' + ' ' * (len('    [+] Description:') + 2)
                 maxlength_available = one_terminal_line_width - len(whitespaces) - len(sb) - len("Description:") - 3
                 there_is_offset = True
                 # Create an alternative description only for print. Original description returned will not be wrapped
