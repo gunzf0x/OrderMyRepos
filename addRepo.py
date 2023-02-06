@@ -118,11 +118,11 @@ def check_HTTP_status_code(args_var, OS):
     # Find programming language if it was set by the user, otherwise use Github language bar and take the one with higher percentage
     if not args_var.language:
         language = soup.find("span", attrs={'class': 'Progress-item color-bg-success-emphasis'})
-        language = language.get("aria-label")
-        language = remove_numbers(language)
-
-        if not language or language == '':
-            print(f"{whitespaces}{warning} {colors['RED']}Warning{colors['NC']}: No programming language found for the repository. Using 'None' as default")
+        try:
+            language = language.get("aria-label")
+            language = remove_numbers(language)
+        except AttributeError:
+            print(f"{warning} {colors['RED']}Warning{colors['NC']}: No programming language found for the repository. Using 'None' as default")
             language = 'None'
     else: 
         language = args_var.language
