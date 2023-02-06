@@ -48,7 +48,7 @@ def parse_args():
                         help="Use this flag if you want to, additionally, clone the repository on your machine.")
     parser.add_argument("-f", "--filename", type=str, default="repositories.txt",
                         help="File to write the content extracted. If not specified, it will be saved in './repositories.txt' as default")   
-    parser.add_argument("--only-print", action="store_true", 
+    parser.add_argument("--print-only", action="store_true", 
                         help = "Only Print Mode. Use this flag if you do not want to add the description obtained, i.e., only print output")
     parser.add_argument("-t", "--title", type=str, help="Custom title for the repository. If not set, Github default title will be used")
     parser.add_argument("-l", "--language", type=str, help="Custom language for the repository. If not set, it will use the language with a higher percentage in Github language bar")
@@ -178,12 +178,12 @@ def check_HTTP_status_code(args_var, OS):
     return header, language, fixed_description[0]
 
 
-def check_if_only_print_mode_is_enabled(args_var) -> None:
+def check_if_print_only_mode_is_enabled(args_var) -> None:
     """
     Check is the user wants to write the output into a file or only wants to print the info/output
     """
-    if args_var.only_print:
-        print(f"{sb} Only Print Mode. No description added")
+    if args_var.print_only:
+        print(f'{sb} "Print Only" Mode enabled. No description added to file.')
         sys.exit(0)
     return
 
