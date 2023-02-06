@@ -19,13 +19,13 @@ pip3 install tabulate
 ### Installing
 Run:
 ```
-git clone https://github.com/p4nchit0z/addRepo.git
+git clone https://github.com/p4nchit0z/OrderMyRepos.git
 ```
 ### Usage - addRepo.py
 
 * Once downloaded/cloned, just run:
 ```
-python3 addRepo.py -w https://SOMEGITHUBPAGEHERE.com/USER_HERE/REPO_HERE
+python3 addRepo.py -w https://github.com/USER_HERE/REPO_HERE
 ```
 
 Using this repository as an example:
@@ -34,7 +34,7 @@ Using this repository as an example:
 python3 addRepo.py -w https://github.com/p4nchit0z/OrderMyRepos
 ```
 
-by default, this will create a file `repositories.txt` in the directory the script is being run (not where the script is located) with multiple columns: 
+by default, this will create a file `repositories.txt` in the current directory the script is being run (not where the script is located) with multiple columns: 
 
    1. Save the original Github's weblink.
    2. Extract the title/main header of the Github's repository.
@@ -65,12 +65,7 @@ while read line; do git clone $(echo $line | awk -F '--' '{printf $1}'); done < 
 To check more features, just type:
 ```
 python3 addRepo.py --help
-```
-
-and
-
-```
-python3 showRepo.py
+python3 showRepo.py --help
 ```
 
 ## Authors
