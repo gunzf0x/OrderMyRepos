@@ -7,6 +7,8 @@ import requests
 from pathlib import Path
 import re
 import subprocess
+import shutil
+import textwrap
 
 # ANSI escape codes dictionary
 colors = {
@@ -165,10 +167,22 @@ def check_HTTP_status_code(args_var, OS):
                 description += f"{word} "
             else:
                 description += word
-        # Print the 'rebuilt' description
+
+        there_is_offset = False
+        # Check if the description has a length that fits with the width of the current terminal
+        one_terminal_line_width =  shutil.get_terminal_size()[0]
+        if (len(description) + len(whitespaces) + len(sb) + len("Description:") + 4) >= one_terminal_line_width:
+                offset = ' ' * (len(whitespaces) + len(sb) + len("Description:") + 3)
+                maxlength_available = one_terminal_line_width - len(whitespaces) - len(sb) - len("Description:") - 3
+                there_is_offset = True
+                # Create an alternative description only for print. Original description returned will not be wrapped
+                description_alternative = offset.join(textwrap.wrap(description,width=maxlength_available))
         if len(items) == 1:
             print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Description: {colors["NC"]}', end='')
-            print(f'{colors["L_GREEN"]}"{description}"{colors["NC"]}')
+            if there_is_offset:
+                print(f'{colors["L_GREEN"]}"{description_alternative}"{colors["NC"]}')
+            else:
+                print(f'{colors["L_GREEN"]}"{description}"{colors["NC"]}')
             fixed_description.append(description)
             break
         else:
