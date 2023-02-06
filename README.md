@@ -42,10 +42,14 @@ by default, this will create a file `repositories.txt` in the current directory 
    4. Selects the (main) programming language, as indicated by Github's language bar.
    5. Extracts the description for the repository
 
+Every time you run this script you will add a new line to your file.
+
 However, I know this is a lot of stuff to our eyes if we open the file `repositories.txt` (or whatever the file you have saved your repos). For that reason I also created an additional featured called `showRepo.py`
 
 
 ### Usage - showRepo.py
+
+After executing `addRepo.py` and create a file `repositories.txt`, just run:
 
 ```
 python3 showRepo.py
