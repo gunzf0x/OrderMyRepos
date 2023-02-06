@@ -122,7 +122,7 @@ def check_HTTP_status_code(args_var, OS):
             language = language.get("aria-label")
             language = remove_numbers(language)
         except AttributeError:
-            print(f"{warning} {colors['RED']}Warning{colors['NC']}: No programming language found for the repository. Using 'None' as default")
+            print(f"{warning} {colors['RED']}Warning!{colors['NC']} No programming language found for the repository. Using 'None' as default")
             language = 'None'
     else: 
         language = args_var.language
@@ -210,7 +210,7 @@ def check_operating_system(args_var) -> str:
     """
     # Check if the user has provided a flag for 'Operating System'
     if not args_var.operating_system:
-        print(f'{warning} Warning! No Operating System selected. Selecting "Any" as Operating System (default)')
+        print(f'{warning} {colors["RED"]}Warning!{colors["NC"]} No Operating System selected. Selecting "Any" as Operating System (default)')
         return "Any"
 
     # If the user has provided it, select if it is for Windows, Linux, Any or is incorrect
