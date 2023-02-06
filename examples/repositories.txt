@@ -1,0 +1,5 @@
+https://github.com/sindresorhus/awesome.git -- 😎 Awesome lists about all kinds of interesting topics
+https://github.com/rafi/awesome-vim-colorschemes.git -- Collection of awesome color schemes for Neo/vim, merged for quick use.
+https://github.com/vinta/awesome-python.git -- A curated list of awesome Python frameworks, libraries, software and resources
+https://github.com/avelino/awesome-go.git -- A curated list of awesome Go frameworks, libraries and software
+https://github.com/rockerBOO/awesome-neovim.git -- Collections of awesome neovim plugins.
