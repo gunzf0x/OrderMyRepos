@@ -31,6 +31,8 @@ colors = {
 
 # Define a simple character to print steps
 sb: str = f'{colors["L_CYAN"]}[*]{colors["NC"]}'
+sb_v2: str = f'{colors["RED"]}[{colors["YELLOW"]}+{colors["RED"]}]{colors["NC"]}'
+warning: str = f'{colors["YELLOW"]}[{colors["RED"]}!{colors["YELLOW"]}]{colors["NC"]}'
 whitespaces: str = " "*(len('[*]')+1)
 
 def parse_args():
@@ -45,8 +47,16 @@ def parse_args():
     parser.add_argument("-c", "--clone", action="store_true",
                         help="Use this flag if you want to, additionally, clone the repository on your machine.")
     parser.add_argument("-f", "--filename", type=str, default="repositories.txt",
-                        help="File to write the content extracted. If not specified, it will be saved in './repositories.txt' as default")
-    parser.add_argument("-x", "--html-class", type=str, default="f4 my-3", help="HTML class containing the description for the repository (default in Github: 'f4-my3')")
+                        help="File to write the content extracted. If not specified, it will be saved in './repositories.txt' as default")   
+    parser.add_argument("--only-print", action="store_true", 
+                        help = "Only Print Mode. Use this flag if you do not want to add the description obtained, i.e., only print output")
+    parser.add_argument("-t", "--title", type=str, help="Custom title for the repository. If not set, Github default title will be used")
+    parser.add_argument("-l", "--language", type=str, help="Custom language for the repository. If not set, it will use the language with a higher percentage in Github language bar")
+    parser.add_argument("-os", "--operating-system", type=str, 
+                        help="Operating system scope for the repository. Options: '(W)indows', '(L)inux' or '(A)ny' (default: 'Any')")
+    parser.add_argument("-x", "--html-class", type=str, default="f4 my-3", 
+                        help="HTML class containing the description for the repository (default in Github: 'f4 my-3')")
+
 
     # Parse the command-line arguments
     args = parser.parse_args(sys.argv[1:])
@@ -54,6 +64,14 @@ def parse_args():
     check_arguments_length(parser)
 
     return args
+
+
+def remove_numbers(string):
+    """
+    Remove all words that are exlusively a number/float from a string.
+    Example, "go1 123.5 aaaa j2 400" will be filtered as "go1 aaaa j2"
+    """
+    return re.sub(r'\b\d+(?:\.\d+)?\b', '', string).strip().replace('  ', ' ')
 
 
 def check_arguments_length(parser_variable) -> None:
@@ -68,13 +86,13 @@ def check_arguments_length(parser_variable) -> None:
         sys.exit(1)
 
 
-def check_HTTP_status_code(webpage_var: str, html_class_var: str) -> str:
+def check_HTTP_status_code(args_var, OS):
     """
     Check HTTP status code for a web request. If it exists return its content, else executes an error
     """
     # Send an HTTP request to the URL requested by the user
-    print(f"{sb} Sending HTTP request to {webpage_var}...")
-    r = requests.get(webpage_var)
+    print(f"{sb} Sending HTTP request to {args_var.webpage}...")
+    r = requests.get(args_var.webpage)
 
     # Check HHTP status code. If the page does not responds, exit and print the HTTP status code
     if r.status_code != 200:
@@ -86,7 +104,28 @@ def check_HTTP_status_code(webpage_var: str, html_class_var: str) -> str:
     soup = BeautifulSoup(r.text, "lxml")
 
     # Find all the div elements with the class "item"
-    items = soup.find_all(class_=html_class_var)
+    items = soup.find_all(class_=args_var.html_class)
+
+    # Find main header/title if it was set by the user, otherwise use Github main header
+    if args_var.title:
+        header = args_var.title
+    else:
+        header = soup.title.text
+        header = header.replace('GitHub - ', '')
+        header = header.split()[0]
+        header = header[:-1]
+
+    # Find programming language if it was set by the user, otherwise use Github language bar and take the one with higher percentage
+    if not args_var.language:
+        language = soup.find("span", attrs={'class': 'Progress-item color-bg-success-emphasis'})
+        language = language.get("aria-label")
+        language = remove_numbers(language)
+
+        if not language or language == '':
+            print(f"{whitespaces}{warning} {colors['RED']}Warning{colors['NC']}: No programming language found for the repository. Using 'None' as default")
+            language = 'None'
+    else: 
+        language = args_var.language
 
     # Check how many items have been return and, in function of that, display a certain message
     if len(items) > 1:
@@ -98,11 +137,23 @@ def check_HTTP_status_code(webpage_var: str, html_class_var: str) -> str:
         print(f"{sb} Description found!\n")
 
     if len(items) == 0:
-        print(f"{sb} No description found")
-        return 'NO DESCRIPTION'
+        print(f'{warning} No description found')
+        print(f'\n{whitespaces}{sb_v2}{colors["CYAN"]} Title: {colors["NC"]}{colors["L_GREEN"]}"{header}"{colors["NC"]}')
+        print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Operating System: {colors["NC"]}{colors["L_GREEN"]}{OS}{colors["NC"]}')
+        print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Language: {colors["NC"]}{colors["L_GREEN"]}{language}{colors["NC"]}')
+        print(f"{whitespaces}{sb_v2}{colors['CYAN']} Description: {colors['NC']}NO DESCRIPTION")
+        print()
+        return header, language, 'NO DESCRIPTION'
 
     # Create a simple array that will store the description string
     fixed_description = []
+
+    # Print the webpage/repository title
+    print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Title: {colors["NC"]}{colors["L_GREEN"]}{header}{colors["NC"]}')
+    # Print the OS provided by the user
+    print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Operating System: {colors["NC"]}{colors["L_GREEN"]}{OS}{colors["NC"]}')
+    # Print the programming language provided by the user/detected by BeautifulSoup
+    print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Language: {colors["NC"]}{colors["L_GREEN"]}{language}{colors["NC"]}')
 
     # Print the text of each items
     for i, item in enumerate(items):
@@ -116,24 +167,73 @@ def check_HTTP_status_code(webpage_var: str, html_class_var: str) -> str:
                 description += word
         # Print the 'rebuilt' description
         if len(items) == 1:
-            print(f'{colors["RED"]}[{colors["YELLOW"]}+{colors["RED"]}] {colors["L_GREEN"]}"{description}"{colors["NC"]}')
+            print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Description: {colors["NC"]}', end='')
+            print(f'{colors["L_GREEN"]}"{description}"{colors["NC"]}')
             fixed_description.append(description)
             break
         else:
             print(f'{whitespaces}{colors["RED"]}{i+1}) "{description}"{colors["NC"]}')
         fixed_description.append(description)
     print("")
-    return fixed_description[0]
+    return header, language, fixed_description[0]
 
 
-def check_file_to_write(args_var, description: str) -> None:
+def check_if_only_print_mode_is_enabled(args_var) -> None:
+    """
+    Check is the user wants to write the output into a file or only wants to print the info/output
+    """
+    if args_var.only_print:
+        print(f"{sb} Only Print Mode. No description added")
+        sys.exit(0)
+    return
+
+
+def ask_to_user_if_wants_to_write(name_file: str) -> None:
+    ask_user = input(f"{whitespaces}Would you like to write the output to '{name_file}' file? {colors['YELLOW']}[Y (or Enter)/N]{colors['NC']}: ")
+    print()
+    # If the user just presses Enter
+    if not ask_user:
+        return
+    # If the user 
+    if re.match(r"^y(es)?$", ask_user, re.IGNORECASE):
+        return
+    elif re.match(r"^n(o)?$", ask_user, re.IGNORECASE):
+        print(f"{whitespaces}{sb_v2} Data will not be saved into a file. Exiting...")
+        sys.exit(1)
+    else:
+        print(f"{whitespaces}{sb_v2} Invalid option. Exiting...")
+        sys.exit(1)
+
+def check_operating_system(args_var) -> str:
+    """
+    Check operating system provided by the user. If not provided or input is invalid, returns 'Any' as default
+    """
+    # Check if the user has provided a flag for 'Operating System'
+    if not args_var.operating_system:
+        print(f'{warning} Warning! No Operating System selected. Selecting "Any" as Operating System (default)')
+        return "Any"
+
+    # If the user has provided it, select if it is for Windows, Linux, Any or is incorrect
+    if re.match(r"^w(indows)?$", args_var.operating_system, re.IGNORECASE): # re.IGNORECASE is case-insensitive, i.e., 'windows = WindoWS'
+        return "Windows"
+    elif re.match(r"^l(inux)?$", args_var.operating_system, re.IGNORECASE):
+        return "Linux"
+    elif re.match(r"^a(ny)?$", args_var.operating_system, re.IGNORECASE):
+        return "Any"
+    else:
+        print(f'{warning} Warning! Invalid Operating System provided ("{args_var.operating_system}"). Returning "Any" as Operating System (default)')
+        return "Any"
+
+
+
+def check_file_to_write(args_var, description: str, header: str, OS_selected: str, language: str) -> None:
     """
     Checks if the file to write the output exists. If it exists, add a line. If not, creates it.
     """
     file_to_append = Path.cwd().joinpath(args_var.filename)
     
     # The following string will be added to the file given by the user
-    description_to_add = f"{args_var.webpage}.git -- {description}\n"
+    description_to_add = f"{args_var.webpage}.git -- {header} -- {OS_selected} -- {language} -- {description}\n"
 
     # Get path to the file
     file_path = Path(file_to_append)
@@ -192,11 +292,32 @@ def main():
     """
     MAIN
     """
-    args = parse_args()
-    description_obtained = check_HTTP_status_code(args.webpage, args.html_class) 
-    check_file_to_write(args_var=args, description=description_obtained, )
+    print()
+    # Obtain arguments/flags from the user
+    args = parse_args() 
+
+    # Check Operating System scope provided by the user (default: Any)
+    OS = check_operating_system(args_var=args)
+
+    # Get the description/items from the webpage
+    header_obtained, language_obtained, description_obtained = check_HTTP_status_code(args, OS) 
+
+    # Check if the user wants to write output on a file (default: True)
+    check_if_only_print_mode_is_enabled(args_var=args)
+
+    # Ask to the user if wants to write the output shown above to the file
+    ask_to_user_if_wants_to_write(args.filename)
+
+    # Check if the file to write output exists
+    check_file_to_write(args_var=args, description=description_obtained, 
+                        header=header_obtained, OS_selected=OS, language=language_obtained)
+
+    # Check if the user wants to clone the repository in the current directory
     clone_repo(args_var=args)
+
+    # Done
     print(f"{sb} Done!")
+
 
 if __name__ == "__main__":
     main()
