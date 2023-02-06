@@ -51,9 +51,9 @@ def parse_args():
     parser.add_argument("-f", "--filename", type=str, default="repositories.txt",
                         help="File to write the content extracted. If not specified, it will be saved in './repositories.txt' as default")   
     parser.add_argument("--print-only", action="store_true", 
-                        help = "Only Print Mode. Use this flag if you do not want to add the description obtained, i.e., only print output")
-    parser.add_argument("-t", "--title", type=str, help="Custom title for the repository. If not set, Github default title will be used")
-    parser.add_argument("-l", "--language", type=str, help="Custom language for the repository. If not set, it will use the language with a higher percentage in Github language bar")
+                        help = "Only Print Mode. Use this flag if you do not want to add the description obtained to a file, i.e., only prints output")
+    parser.add_argument("-t", "--title", type=str, help="Custom title for the repository. If not set, Github's default title will be used")
+    parser.add_argument("-l", "--language", type=str, help="Custom language for the repository. If not set, it will use the language with a higher percentage in Github's language bar")
     parser.add_argument("-os", "--operating-system", type=str, 
                         help="Operating system scope for the repository. Options: '(W)indows', '(L)inux' or '(A)ny' (default: 'Any')")
     parser.add_argument("-x", "--html-class", type=str, default="f4 my-3", 
