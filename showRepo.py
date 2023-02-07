@@ -53,8 +53,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sort-by-repo", action="store_true", help="Sort repositories alphabetically by their name (not considering authors)")
     parser.add_argument("-tf", "--table-format", type=str, default="grid",
                         help="Table format output. Check 'Table format' section at https://pypi.org/project/tabulate/ to see all options available. Some of them might be bugged. For some formats it is necessary to additionally use '--no-color' flag")
-    parser.add_argument("--skip-stats", action="store_true",
-                        help="Do not display some statistics about the repositories (such as number of languages, distribution by OS, etc)")
+    parser.add_argument("--show-stats", action="store_true",
+                        help="Display some statistics about the repositories (such as number of languages, distribution by OS, etc)")
     parser.add_argument("--no-color", action="store_true", help="Do not display the table with colors")
 
     # Parse the command-line arguments
@@ -63,25 +63,19 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def get_table_elements(flags_var):
+def get_body_table(flags_var):
     """
     Creates items that will be stored inside 'tabulate' object
     """
-    # Headers for the table
-    headers_table = ["Repository Name", "OS", "Language", "Description"]
+    
     # Body (data) for the table (allocated in "repositories.txt" or file given by '-f' flag)
     rows_table = read_columns_in_repository_file(flags_var)
     # Since we do not want to print all the data, select only the columns we will use
     printable_data_rows_table = [[item for item in sublist[1:]] for sublist in rows_table]
 
-    if flags_var.no_color:
-        return headers_table, printable_data_rows_table
-    else:
-        colors_headers_table = [f"{colors['L_CYAN']}Repo Name{colors['NC']}",
-                                f"{colors['PINK']}OS{colors['NC']}",
-                                f"{colors['L_RED']}Language{colors['NC']}",
-                                f"{colors['L_GREEN']}Description{colors['NC']}"]
-        return colors_headers_table, printable_data_rows_table
+    return printable_data_rows_table
+
+    
 
 def get_percentage(number: int, total: int) -> float:
     return round(number/(1.0*total) * 100, 1)
@@ -90,7 +84,7 @@ def stats_table_elements(flags_var, table_elements):
     """
     Analyze some elements extracted from the repositories file
     """
-    if flags_var.skip_stats:
+    if not flags_var.show_stats:
         return
     # Check the number of programming languages
     languages = [item[2].lower() for item in table_elements]
@@ -190,7 +184,7 @@ def filter_data_table(flags_var, printable_data_table):
             if flags_var.no_color:
                 print(f"[!] ERROR: No items found for {only_os_var} OS...")
             else:
-                print(f"{warning} {colors['RED']}ERROR:{colors['NC']} ERROR: No items found for {only_os_var} OS...")
+                print(f"{warning} {colors['RED']}ERROR:{colors['NC']} No items found for {only_os_var} OS...")
             sys.exit(1)
         printable_data_table = temp_data_table
 
@@ -201,11 +195,15 @@ def filter_data_table(flags_var, printable_data_table):
                 printable_data_table[index][0] = row[0].split('/')[1]
             except:
                 pass
-    print([items[0] for items in printable_data_table])
     return printable_data_table
             
 
 def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
+
+    # Headers for the table
+    headers_table = ["Repository Name", "OS", "Language", "Description"]
+
+
     # Get the max length (the sum of them) for columns that are not the "Description column"
     max_length = 0
     for col in printable_data_rows_table:
@@ -217,8 +215,13 @@ def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
 
     if flags_var.no_color:
         #headers_table = original_header
-        return printable_data_rows_table, max_allowed_length
+        return headers_table, printable_data_rows_table, max_allowed_length
     else:
+        colors_headers_table = [f"{colors['L_CYAN']}Repo Name{colors['NC']}",
+                                f"{colors['PINK']}OS{colors['NC']}",
+                                f"{colors['L_RED']}Language{colors['NC']}",
+                                f"{colors['L_GREEN']}Description{colors['NC']}"]
+
         # Create a table body containing ANSI escape codes so it will print in colors
         colors_row_table = []
         for row in printable_data_rows_table:
@@ -232,7 +235,7 @@ def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
             # 'Description' column
             color_column.append(f"{colors['GREEN']}{row[3]}{colors['NC']}")
             colors_row_table.append(color_column)
-        return colors_row_table, max_allowed_length
+        return colors_headers_table, colors_row_table, max_allowed_length
 
 
 def read_columns_in_repository_file(flag_var):
@@ -247,7 +250,7 @@ def read_columns_in_repository_file(flag_var):
             for column in row:
                 col.append(column.strip())
             rows.append(col)
-    if flag_var.skip_stats:
+    if not flag_var.show_stats:
         return rows
     print()
     if flag_var.no_color:
@@ -288,12 +291,12 @@ def main():
     # Get terminal width
     width = shutil.get_terminal_size()[0]
     # Get the header and the body for the table
-    headers_table, printable_data_table = get_table_elements(flags)
+    printable_data_table = get_body_table(flags)
     # Print some stats about the data provided
     stats_table_elements(flags, printable_data_table)
     # Sort/filter the list (or not) based on the flags provided
     filtered_printable_data_table = filter_data_table(flags, printable_data_table)
-    body_table, max_allowed_length = create_table_elements(flags, width, filtered_printable_data_table)
+    headers_table, body_table, max_allowed_length = create_table_elements(flags, width, filtered_printable_data_table)
 
     # Print the table
     print()
