@@ -60,11 +60,10 @@ def create_table_elements(flags_var):
         headers_table = original_header
 
     else:
-        # To print in color inside the table you have to use 'colorama'. Using ANSI codes bugs the table
         headers_table = [f"{colors['RED']}Repo Name{colors['NC']}",
-                         f"{colors['RED']}OS{colors['NC']}",
-                         f"{colors['RED']}Language{colors['NC']}",
-                         f"{colors['RED']}Description{colors['NC']}"]
+                         f"{colors['PURPLE']}OS{colors['NC']}",
+                         f"{colors['L_CYAN']}Language{colors['NC']}",
+                         f"{colors['L_GREEN']}Description{colors['NC']}"]
 
         print(headers_table)
     body = [["test", "Linux", "Python", "Da best"]]
