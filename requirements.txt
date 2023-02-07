@@ -1,2 +1,2 @@
 beautifulsoup4
-tabulate
+tabulate>=0.8.10
