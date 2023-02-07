@@ -1,3 +1,6 @@
-https://github.com/sshuttle/sshuttle.git -- sshuttle/sshuttle -- Linux -- Python -- Transparent proxy server that works as a poor man's VPN. Forwards over ssh. Doesn't require admin. Works with Linux and MacOS. Supports DNS tunneling.
-https://github.com/t3l3machus/psudohash.git -- t3l3machus/psudohash -- Any -- Python -- Password list generator that focuses on keywords mutated by commonly used password creation patterns
-https://github.com/hmgle/graftcp.git -- hmgle/graftcp -- Linux -- C -- A flexible tool for redirecting a given program's TCP traffic to SOCKS5 or HTTP proxy.
+https://github.com/avelino/awesome-go.git -- avelino/awesome-go -- Any -- Go -- A curated list of awesome Go frameworks, libraries and software
+https://github.com/sindresorhus/awesome.git -- sindresorhus/awesome -- Any -- None -- 😎 Awesome lists about all kinds of interesting topics
+https://github.com/rafi/awesome-vim-colorschemes.git -- rafi/awesome-vim-colorschemes -- Any -- Vim Script -- Collection of awesome color schemes for Neo/vim, merged for quick use.
+https://github.com/vinta/awesome-python.git -- vinta/awesome-python -- Any -- Python -- A curated list of awesome Python frameworks, libraries, software and resources
+https://github.com/rockerBOO/awesome-neovim.git -- rockerBOO/awesome-neovim -- Any -- None -- Collections of awesome neovim plugins.
+https://github.com/spf13/cobra.git -- spf13/cobra -- Any -- Go -- A Commander for modern Go CLI interactions
