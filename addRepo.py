@@ -58,13 +58,9 @@ def parse_args():
                         help="Operating system scope for the repository. Options: '(W)indows', '(L)inux' or '(A)ny' (default: 'Any')")
     parser.add_argument("-x", "--html-class", type=str, default="f4 my-3", 
                         help="HTML class containing the description for the repository (default in Github: 'f4 my-3')")
-
-
     # Parse the command-line arguments
     args = parser.parse_args(sys.argv[1:])
-
     check_arguments_length(parser)
-
     return args
 
 
@@ -95,19 +91,14 @@ def check_HTTP_status_code(args_var, OS):
     # Send an HTTP request to the URL requested by the user
     print(f"{sb} Sending HTTP request to {args_var.webpage}...")
     r = requests.get(args_var.webpage)
-
     # Check HHTP status code. If the page does not responds, exit and print the HTTP status code
     if r.status_code != 200:
         print("Error: HTTP status code {r.status_code}")
         sys.exit(1)
-
-
     # Get the HTML content of the webpage
     soup = BeautifulSoup(r.text, "lxml")
-
     # Find all the div elements with the class "item"
     items = soup.find_all(class_=args_var.html_class)
-
     # Find main header/title if it was set by the user, otherwise use Github main header
     if args_var.title:
         header = args_var.title
@@ -116,7 +107,6 @@ def check_HTTP_status_code(args_var, OS):
         header = header.replace('GitHub - ', '')
         header = header.split()[0]
         header = header[:-1]
-
     # Find programming language if it was set by the user, otherwise use Github language bar and take the one with higher percentage
     if not args_var.language:
         language = soup.find("span", attrs={'class': 'Progress-item color-bg-success-emphasis'})
@@ -128,7 +118,6 @@ def check_HTTP_status_code(args_var, OS):
             language = 'None'
     else: 
         language = args_var.language
-
     # Check how many items have been return and, in function of that, display a certain message
     if len(items) > 1:
         print(f"{sb}Warning! More than 1 items found. Found {len(items)} items.")
@@ -149,7 +138,6 @@ def check_HTTP_status_code(args_var, OS):
 
     # Create a simple array that will store the description string
     fixed_description = []
-
     # Print the webpage/repository title
     print(f'{whitespaces}{sb_v2}{colors["CYAN"]} Title: {colors["NC"]}{colors["L_GREEN"]}{header}{colors["NC"]}')
     # Print the OS provided by the user
@@ -167,7 +155,6 @@ def check_HTTP_status_code(args_var, OS):
                 description += f"{word} "
             else:
                 description += word
-
         there_is_offset = False
         # Check if the description has a length that fits with the width of the current terminal
         one_terminal_line_width =  shutil.get_terminal_size()[0]
@@ -203,6 +190,9 @@ def check_if_print_only_mode_is_enabled(args_var) -> None:
 
 
 def ask_to_user_if_wants_to_write(name_file: str) -> None:
+    """
+    Asks to the user if wants to write the output into a file
+    """
     ask_user = input(f"{whitespaces}Would you like to write the output to '{name_file}' file? {colors['YELLOW']}[Y (or Enter)/N]{colors['NC']}: ")
     print()
     # If the user just presses Enter
@@ -218,6 +208,7 @@ def ask_to_user_if_wants_to_write(name_file: str) -> None:
         print(f"{whitespaces}{sb_v2} Invalid option. Exiting...")
         sys.exit(1)
 
+
 def check_operating_system(args_var) -> str:
     """
     Check operating system provided by the user. If not provided or input is invalid, returns 'Any' as default
@@ -226,7 +217,6 @@ def check_operating_system(args_var) -> str:
     if not args_var.operating_system:
         print(f'{warning} {colors["RED"]}Warning!{colors["NC"]} No Operating System selected. Selecting "Any" as Operating System (default)')
         return "Any"
-
     # If the user has provided it, select if it is for Windows, Linux, Any or is incorrect
     if re.match(r"^w(indows)?$", args_var.operating_system, re.IGNORECASE): # re.IGNORECASE is case-insensitive, i.e., 'windows = WindoWS'
         return "Windows"
@@ -237,7 +227,6 @@ def check_operating_system(args_var) -> str:
     else:
         print(f'{warning} Warning! Invalid Operating System provided ("{args_var.operating_system}"). Returning "Any" as Operating System (default)')
         return "Any"
-
 
 
 def check_file_to_write(args_var, description: str, header: str, OS_selected: str, language: str) -> None:
@@ -309,26 +298,19 @@ def main():
     print()
     # Obtain arguments/flags from the user
     args = parse_args() 
-
     # Check Operating System scope provided by the user (default: Any)
     OS = check_operating_system(args_var=args)
-
     # Get the description/items from the webpage
     header_obtained, language_obtained, description_obtained = check_HTTP_status_code(args, OS) 
-
     # Check if the user wants to write output on a file (default: True)
     check_if_print_only_mode_is_enabled(args_var=args)
-
     # Ask to the user if wants to write the output shown above to the file
     ask_to_user_if_wants_to_write(args.filename)
-
     # Check if the file to write output exists
     check_file_to_write(args_var=args, description=description_obtained, 
                         header=header_obtained, OS_selected=OS, language=language_obtained)
-
     # Check if the user wants to clone the repository in the current directory
     clone_repo(args_var=args)
-
     # Done
     print(f"{sb} Done!")
 
