@@ -5,3 +5,4 @@ https://github.com/vinta/awesome-python.git -- vinta/awesome-python -- Any -- Py
 https://github.com/rockerBOO/awesome-neovim.git -- rockerBOO/awesome-neovim -- Any -- None -- Collections of awesome neovim plugins.
 https://github.com/spf13/cobra.git -- spf13/cobra -- Any -- Go -- A Commander for modern Go CLI interactions
 https://github.com/othneildrew/Best-README-Template.git -- othneildrew/Best-README-Template -- Any -- None -- An awesome README template to jumpstart your projects!
+https://github.com/GunZF0x/OrderMyRepos.git -- GunZF0x/OrderMyRepos -- Any -- Python -- Tools to help you to organize the chaos left after cloning multiple repositories
