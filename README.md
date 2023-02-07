@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/GunZF0x/OrderMyRepos">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/logo.png" alt="Logo" width="569" height="109">
   </a>
 
 <h3 align="center">OrderMyRepos</h3>
@@ -81,7 +81,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![OrderMyRepos][product-screenshot]](https://github.com/GunZF0x/OrderMyRepos)
 
 Tools written in Python3 to help you organize your repositories Github cloned repositories
 
