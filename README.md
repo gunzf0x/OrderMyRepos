@@ -137,7 +137,7 @@ python3 addRepo.py -w https://github.com/USER_HERE/REPO_HERE
 Using this repository as an example:
 
 ```sh
-python3 addRepo.py -w https://github.com/p4nchit0z/OrderMyRepos
+python3 addRepo.py -w https://github.com/GunZF0x/OrderMyRepos
 ```
 
 by default, this will create a file `repositories.txt` in the current directory the script is being run (not where the script is located) with multiple columns: 
