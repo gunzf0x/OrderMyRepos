@@ -78,7 +78,11 @@ def get_body_table(flags_var):
     
 
 def get_percentage(number: int, total: int) -> float:
+    """
+    Returns the percentage a number represents within a total
+    """
     return round(number/(1.0*total) * 100, 1)
+
 
 def stats_table_elements(flags_var, table_elements):
     """
@@ -110,6 +114,7 @@ def stats_table_elements(flags_var, table_elements):
         print(f"{whitespaces}{sb_v2} Linux: {colors['PURPLE']}{counts_OS['Linux']}{colors['NC']} ({colors['RED']}{linux_percentage}%{colors['NC']})")
         print(f"{whitespaces}{sb_v2} Windows: {colors['PURPLE']}{counts_OS['Windows']}{colors['NC']} ({colors['RED']}{windows_percentage}%{colors['NC']})")
     return
+
 
 def filter_data_table(flags_var, printable_data_table):
     """
@@ -199,6 +204,9 @@ def filter_data_table(flags_var, printable_data_table):
             
 
 def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
+    """
+    Add colors to the table and sets their parts ready to be printed
+    """
 
     # Headers for the table
     headers_table = ["Repository Name", "OS", "Language", "Description"]
@@ -211,6 +219,7 @@ def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
         if new_length > max_length:
             max_length = new_length
 
+    # Max allowed length before 'wrapping' text
     max_allowed_length = width_terminal - max_length - 12
 
     if flags_var.no_color:
@@ -281,6 +290,7 @@ def check_file_to_read(flags_var) -> None:
 
     return None
 
+
 def print_table(flags_var, body_table, headers_table, max_allowed_length):
     """
     Print the final table/result
@@ -325,7 +335,6 @@ def main():
     # Save the file
     save_file(flags, filtered_printable_data_table, max_allowed_length)
     
-
 
 if __name__ == "__main__":
         main()
