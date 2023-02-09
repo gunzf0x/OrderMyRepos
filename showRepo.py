@@ -9,6 +9,7 @@ from collections import Counter
 import re
 import pyperclip
 
+
 # ANSI escape codes dictionary
 colors = {
         "BLACK": '\033[30m',
@@ -29,32 +30,12 @@ colors = {
         "NC": '\033[0m'
         }
 
+
 # Define a simple character to print steps
 sb: str = f'{colors["L_CYAN"]}[*]{colors["NC"]}'
 sb_v2: str = f'{colors["RED"]}[{colors["YELLOW"]}+{colors["RED"]}]{colors["NC"]}'
 whitespaces: str = " "*(len('[*]')+1)
 warning: str = f'{colors["YELLOW"]}[{colors["RED"]}!{colors["YELLOW"]}]{colors["NC"]}'
-
-
-def print_colors(no_color_boolean: bool, 
-                 message: str, mode='output') -> None:
-    """
-    Simple message handler for '--no-color' flag
-    """
-    if mode == "output":
-        if no_color_boolean:
-            print(f"[*] {message}")
-        else:
-            print(f"{sb} {message}")
-        return
-    if mode == "warning":
-        if no_color_boolean:
-            print("[!] {message}")
-        else:
-            print("{warning} {colors['RED']}{message}{colors['NC']}")
-        return
-    print("No valid mode selected")
-    sys.exit(1)
 
 
 def parse_args() -> argparse.Namespace:
@@ -87,6 +68,33 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args(sys.argv[1:])
 
     return args
+
+
+def print_colors(no_color_boolean: bool, 
+                 message: str, mode='output') -> None:
+    """
+    Simple message handler for '--no-color' flag
+    """
+    if mode == "output":
+        if no_color_boolean:
+            print(f"[*] {message}")
+        else:
+            print(f"{sb} {message}")
+        return
+    if mode == "warning":
+        if no_color_boolean:
+            print(f"[!] {message}")
+        else:
+            print(f"{warning} Warning! {message}")
+        return
+    if mode == "error":
+        if no_color_boolean:
+            print(f"[!] Error: {message}")
+        else:
+            print(f"{warning} {colors['RED']}Error: {message}{colors['NC']}")
+        return
+    print("No valid mode selected")
+    sys.exit(1)
 
 
 def get_percentage(number: int, total: int) -> float:
@@ -139,23 +147,21 @@ def filter_data_table(flags_var, printable_data_table):
         printable_data_table = temp_data_table
     # Sort repositories aplhabetically by its programming language 
     if flags_var.sort_by_language:
+        if flags_var.only_language:
+            print_colors(flags_var.no_color, "'--sort-by-language' and '--only-language' flags simultaneously enabled...",
+                         mode='warning')
         temp_data_table = sorted(printable_data_table, key= lambda x: x[3])
         printable_data_table = temp_data_table
     # Sort repositories alphabetically by repository name
     if flags_var.sort_by_repo:
         if flags_var.sort_by_author or flags_var.sort_by_repo:
-            if flags_var.no_color:
-                print("[!] Warning! Multiple 'sort' flags simultaneously enabled. Output will be sortered by repository name...")
-            else:
-                print(f"{warning} {colors['RED']}Warning!{colors['NC']} Multiple 'sort' simultaneously enabled. Output will be sortered by repository name...")
+            print_colors(flags_var.no_color, "Multiple 'sort' flags simultaneously enabled. Output will be sortered by repository name...",
+                         mode='warning')
         try:
             temp_data_table = sorted(printable_data_table, key=lambda x: x[1].split('/')[1])
             printable_data_table = temp_data_table
         except:
-            if flags_var.no_color:
-                print("[!] Unable to sort by author")
-            else:
-                print(f"{warning} Unable to sort by author")
+            print_colors(flag_var.no_color, "Unable to sort by author", mode='warning')
     # Filter by programming language             
     if flags_var.only_language:
         temp_data_table = []
@@ -163,10 +169,8 @@ def filter_data_table(flags_var, printable_data_table):
             if rows[3].lower() == flags_var.only_language.lower():
                 temp_data_table.append(rows)
         if len(temp_data_table) == 0:
-            if flags_var.no_color:
-                print(f"[!] ERROR: No results found for language '{flags_var.only_language}'...")
-            else:
-                print(f"{warning} {colors['RED']}ERROR:{colors['NC']} No results found for language '{flags_var.only_language}'...")
+            print_colors(flags_var.no_color, f"No results found for language '{flags_var.only_language}'...",
+                         mode='error')
             sys.exit(1)
         printable_data_table = temp_data_table
     # Filter by searching a word in the 'Description' column 
@@ -181,13 +185,10 @@ def filter_data_table(flags_var, printable_data_table):
                     temp_data_table.append(rows)
                     break
         if len(temp_data_table) == 0:
-            if flags_var.no_color:
-                    print(f"[!] ERROR: Word '{flags_var.search}' could not be found for any repository...")
-            else:
-                    print(f"{warning} {colors['RED']}ERROR:{colors['NC']} Word '{flags_var.search}' could not be found for any repository...")
+            print_colors(flags_var.no_color, f"Word '{flags_var.search}' could not be found for any repository...",
+                         mode='error')
             sys.exit(1)
         printable_data_table = temp_data_table
-
     # Filter by Operating System
     if flags_var.only_os:
         if re.match(r"^w(indows)?$", flags_var.only_os, re.IGNORECASE):
@@ -197,20 +198,16 @@ def filter_data_table(flags_var, printable_data_table):
         elif re.match(r"^a(ny)?$", flags_var.only_os, re.IGNORECASE):
             only_os_var = "Any"
         else:
-            if flags_var.no_color:
-                print(f"[!] Warning! '{flags_var.only_os}' is not a valid value for '--only-os' flag (only valid values: Any, Linux, Windows). Please retry")
-            else:
-                print(f"{warning}{colors['RED']} Warning!{colors['NC']} '{flags_var.only_os}' is not a valid value for '--only-os' flag (only valid values: Any, Linux, Windows). Please retry")
+            print_colors(flags_var.no_color, f"'{flags_var.only_os}' is not a valid value for '--only-os' flag. Valid values: (A)ny, (L)inux, (W)indows. Please retry...",
+                         mode='warning')
             sys.exit(1)
         temp_data_table = []
         for rows in printable_data_table:
             if rows[2] == only_os_var and only_os_var != '':
                 temp_data_table.append(rows)
         if len(temp_data_table) == 0:
-            if flags_var.no_color:
-                print(f"[!] ERROR: No items found for {only_os_var} OS...")
-            else:
-                print(f"{warning} {colors['RED']}ERROR:{colors['NC']} No items found for {only_os_var} OS...")
+            print_colors(flags_var.no_color, f"No items found for {only_os_var} OS...",
+                        mode = 'error')
             sys.exit(1)
         printable_data_table = temp_data_table
 
@@ -224,16 +221,11 @@ def filter_data_table(flags_var, printable_data_table):
     # Copy lists, after filtering, to output
     if flags_var.copy:
         if len(printable_data_table) == 0:
-            if flags_var.no_color:
-                print("[!] Error. Repository list is empty")
-            else:
-                print(f"{warning} {colors['RED']}Error. Repository list is empty{colors['NC']}")
+            print_colors(flags_var.no_color, "Repository list is empty", mode='error')
             sys.exit(1)
         if len(printable_data_table) == 1:
-            if flags_var.no_color:
-                print("[*] Repository copied to clipboard!")
-            else:
-                print(f"{sb} Repository copied to clipboard!")
+            print_colors(flags_var.no_color, "Repository copied to clipboard!",
+                             mode='output')
             pyperclip.copy(printable_data_table[0][0])
         if len(printable_data_table) > 1:
             repos = []
@@ -260,11 +252,8 @@ def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
     """
     Add colors to the table and sets their parts ready to be printed
     """
-
     # Headers for the table
     headers_table = ["Repository Name", "OS", "Language", "Description"]
-
-
     # Get the max length (the sum of them) for columns that are not the "Description column"
     max_length = 0
     table_to_show = [[item for item in sublist[1:]] for sublist in printable_data_rows_table] 
@@ -272,19 +261,16 @@ def create_table_elements(flags_var, width_terminal, printable_data_rows_table):
         new_length = len(col[0]) + len(col[1]) + len(col[2]) + 12 # '12' considering symbols and spaces
         if new_length > max_length:
             max_length = new_length
-
     # Max allowed length before 'wrapping' text
     max_allowed_length = width_terminal - max_length - 12
 
     if flags_var.no_color:
-        #headers_table = original_header
         return headers_table, table_to_show, max_allowed_length
     else:
         colors_headers_table = [f"{colors['L_CYAN']}Repo Name{colors['NC']}",
                                 f"{colors['PINK']}OS{colors['NC']}",
                                 f"{colors['L_RED']}Language{colors['NC']}",
                                 f"{colors['L_GREEN']}Description{colors['NC']}"]
-
         # Create a table body containing ANSI escape codes so it will print in colors
         colors_row_table = []
         for row in table_to_show:
@@ -336,12 +322,9 @@ def check_file_to_read(flags_var) -> None:
 
     # Check if the file containing the repositories exists
     if not file_path.exists():
-        if not flags_var.no_color:
-            print(f"{warning} {colors['RED']}Warning!{colors['NC']} '{file_to_read}' does not exist. Try using 'addRepo.py' to create a file and retry")
-        else:
-            print(f"[+] Warning: '{file_to_read}' does not exist. Try using 'addRepo.py' to create a file and retry")
+        print_colors(flags_var.no_color, f"{file_to_read}' does not exist. Try using 'addRepo.py' to create a file and retry",
+                     mode='error')
         sys.exit(1)
-
     return None
 
 
