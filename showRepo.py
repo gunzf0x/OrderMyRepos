@@ -362,10 +362,11 @@ def main():
     check_file_to_read(flags)
     # Get terminal width
     width = shutil.get_terminal_size()[0]
-    # Get the header and the body for the table
+    # Get the data contained in the file
     printable_data_table = read_columns_in_repository_file(flags)
     # Sort/filter the list (or not) based on the flags provided
     filtered_printable_data_table = filter_data_table(flags, printable_data_table)
+    # Create the table body that will be printed
     headers_table, body_table, max_allowed_length = create_table_elements(flags, width, filtered_printable_data_table)
     # Print the table
     print_table(flags, body_table, headers_table, max_allowed_length)
