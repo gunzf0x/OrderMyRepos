@@ -38,6 +38,17 @@ whitespaces: str = " "*(len('[*]')+1)
 warning: str = f'{colors["YELLOW"]}[{colors["RED"]}!{colors["YELLOW"]}]{colors["NC"]}'
 
 
+def check_arguments() -> None:
+    """
+    Simple function to check if the user has provided arguments
+    """
+    if len(sys.argv) > 1:
+        return
+    else:
+        print(f"No arguments provided. Run '{sys.argv[0]} --help' and retry")
+        sys.exit(1)
+
+
 def parse_args() -> argparse.Namespace:
     """
     Simple function to get flags given by the user
@@ -356,6 +367,8 @@ def save_file(flags_var, body_table, max_allowed_length):
 
 def main():
     """MAIN"""
+    # Check if the user has provided arguments
+    check_arguments()
     # Get flags from user input
     flags = parse_args()
     # Check if the file that contains the repositories data exists (if not, exits)
