@@ -48,15 +48,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-s", "--search", type=str, help="Search for a word/string in the repository Name")
     parser.add_argument("-l", "--only-language", help="Search for a specific language. Case insensitive.")
     parser.add_argument("-x", "--only-os", type=str, help="Search for a specific repository whose scope is the one in this flag.")
+    parser.add_argument("-o", "--output", type=str, help="Output file to save the table")
     parser.add_argument("--no-author", action="store_true", help="Do not show author name in repository name/only show repository name")
     parser.add_argument("--sort-by-author", action="store_true", help="Sort repositories alphabetically based on repos' authors")
     parser.add_argument("--sort-by-repo", action="store_true", help="Sort repositories alphabetically by their name (not considering authors)")
+    parser.add_argument("--sort-by-language", action="store_true", help="Sort repositories alphabetically by their main programming language")
     parser.add_argument("-tf", "--table-format", type=str, default="grid",
                         help="Table format output. Check 'Table format' section at https://pypi.org/project/tabulate/ to see all options available. Some of them might be bugged. For some formats it is necessary to additionally use '--no-color' flag")
     parser.add_argument("--show-stats", action="store_true",
                         help="Display some statistics about the repositories (such as number of languages, distribution by OS, etc)")
     parser.add_argument("--no-color", action="store_true", help="Do not display the table with colors")
-    parser.add_argument("-o", "--output", type=str, help="Output file to save the table")
     # Parse the coumentmmand-line arguments
     args = parser.parse_args(sys.argv[1:])
 
@@ -120,18 +121,22 @@ def filter_data_table(flags_var, printable_data_table):
     """
     # Save the original table length for analytics purposes
     original_length_table = len(printable_data_table)
+
     # Sort repositories alphabetically by their author
     if flags_var.sort_by_author:
         temp_data_table = sorted(printable_data_table, key=lambda x: x[0])
         printable_data_table = temp_data_table
-
+    # Sort repositories aplhabetically by its programming language 
+    if flags_var.sort_by_language:
+        temp_data_table = sorted(printable_data_table, key= lambda x: x[2])
+        printable_data_table = temp_data_table
     # Sort repositories alphabetically by repository name
     if flags_var.sort_by_repo:
-        if flags_var.sort_by_author:
+        if flags_var.sort_by_author or flags_var.sort_by_repo:
             if flags_var.no_color:
-                print("[!] Warning! '--sort-by-author' and 'sort-by-repo' simultaneously enabled. Output will be sortered by repository name...")
+                print("[!] Warning! Multiple 'sort' flags simultaneously enabled. Output will be sortered by repository name...")
             else:
-                print(f"{warning} {colors['RED']}Warning!{colors['NC']} '--sort-by-author' and '--sort-by-repo' simultaneously enabled. Output will be sortered by repository name...")
+                print(f"{warning} {colors['RED']}Warning!{colors['NC']} Multiple 'sort' simultaneously enabled. Output will be sortered by repository name...")
         try:
             temp_data_table = sorted(printable_data_table, key=lambda x: x[0].split('/')[1])
             printable_data_table = temp_data_table
