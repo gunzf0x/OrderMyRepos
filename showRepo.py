@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-s", "--search", type=str, help="Search for a word/string in the repository Name")
     parser.add_argument("-l", "--only-language", help="Search for a specific language. Case insensitive.")
     parser.add_argument("-x", "--only-os", type=str, help="Search for a specific repository whose scope is the one in this flag.")
-    parser.add_argument("-c", "--copy", action="store_true", help="Copy lists, after filtering, to clipboard")
+    parser.add_argument("-c", "--copy", action="store_true", help="Copy the resulting repositories, after filtering, into clipboard")
     parser.add_argument("-o", "--output", type=str, help="Output file to save the table")
     parser.add_argument("--no-author", action="store_true", help="Do not show author name in repository name/only show repository name")
     parser.add_argument("--sort-by-author", action="store_true", help="Sort repositories alphabetically based on repos' authors")
