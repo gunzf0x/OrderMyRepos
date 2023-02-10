@@ -111,6 +111,7 @@ For this reason I decided to create a couple of simple features to put order in 
    ```sh
    pip3 install beautifulsoup4
    pip3 install tabulate
+   pip3 install pyperclip
    ```
    or run
    ```
