@@ -148,6 +148,20 @@ def stats_table_elements(flags_var, table_elements):
     return
 
 
+def delete_git_extension(no_color_boolean: bool, url: str):
+    """
+    Delete ".git" extension from weblink repository column
+    """
+    # If the last 4 characters are ".git"
+    if url[-4:] == '.git':
+        # Return url without ".git" extension
+        return url[:-4]
+    else:
+        print_colors(no_color_boolean, "Unable to cut '.git' string in '{url}'. Returning original url instead...",
+                     mode='warning')
+        return url
+
+
 def filter_data_table(flags_var, printable_data_table):
     """
     Function that sorts and filters table body/data based on flags provided by the user
@@ -257,11 +271,11 @@ def filter_data_table(flags_var, printable_data_table):
         if len(printable_data_table) == 1:
             print_colors(flags_var.no_color, "Repository copied to clipboard!",
                              mode='output')
-            pyperclip.copy(printable_data_table[0][0])
+            pyperclip.copy(delete_git_extension(flags_var.no_color, printable_data_table[0][0]))
         if len(printable_data_table) > 1:
             repos = []
             for row in printable_data_table:
-                repos.append(row[0])
+                repos.append(delete_git_extension(flags_var.no_color, row[0]))
             repos_string = '\n'.join(map(str, repos))
             pyperclip.copy(repos_string)
             print_colors(flags_var.no_color, "Multiple repositories copied to clipboard!",
