@@ -45,7 +45,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     # Add an argument called "--flag" with action "store_true"
-    parser.add_argument("-w", "--webpage", type=str, help="Webpage to extract the content. For example, a Github repository url (without .git at the end of it)")
+    parser.add_argument("-w", "--webpage", type=str, help="Webpage to extract the content. For example, a Github repository url (without .git at the end of it)",
+                        required=True)
     parser.add_argument("-c", "--clone", action="store_true",
                         help="Use this flag if you want to, additionally, clone the repository on your machine.")
     parser.add_argument("-f", "--filename", type=str, default="repositories.txt",
@@ -66,7 +67,7 @@ def parse_args():
 
 def remove_numbers(string):
     """
-    Remove all words that are exlusively a number/float from a string.
+    Remove all words that are exclusively a number/float from a string.
     Example, "go1 123.5 aaaa j2 400" will be filtered as "go1 aaaa j2"
     """
     return re.sub(r'\b\d+(?:\.\d+)?\b', '', string).strip().replace('  ', ' ')
