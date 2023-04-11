@@ -127,18 +127,18 @@ For this reason I decided to create a couple of simple features to put order in 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-### addRepo.py
+### 'add' Command
 
 Just get the url of the Github repository and add it to out "library":
 
 ```sh
-python3 addRepo.py -w https://github.com/USER_HERE/REPO_HERE
+python3 ordermyrepos.py add -w https://github.com/USER_HERE/REPO_HERE
 ```
 
 Using this repository as an example:
 
 ```sh
-python3 addRepo.py -w https://github.com/GunZF0x/OrderMyRepos
+python3 ordermyrepos.py add -w https://github.com/GunZF0x/OrderMyRepos
 ```
 
 by default, this will create a file `repositories.txt` in the current directory the script is being run (not where the script is located) with multiple columns: 
@@ -153,10 +153,10 @@ Every time you run this script you will add a new line to your file; if the repo
 
 However, I know this is a lot of stuff to our eyes if we open the file `repositories.txt` (or whatever the file you have saved your repos). For that reason I also created an additional featured called `showRepo.py`
 
-### showRepo.py
+### 'show' Command
 
 ```sh
-python3 showRepo.py 
+python3 ordermyrepos.py show 
 ```
 
 this will display the repositories that lies in your `repositories.txt` file in the current directory.
@@ -164,13 +164,23 @@ this will display the repositories that lies in your `repositories.txt` file in 
 However, if you want to use a file that is located anywhere in your system just do:
 
 ```sh
-python3 showRepo.py -f /path/to/repo/file.txt
+python3 ordermyrepos.py show -f /path/to/repo/file.txt
 ```
 
 For example, you can search for the word `organize` for any repository written in `Python` after ordering alphabetically by their author:
+```sh
+python3 ordermyrepos.py show -f examples/repositories.txt -s organize -l python --sort-by-author
 ```
-python3 showRepo.py -f examples/repositories.txt -s organize -l python --sort-by-author
+
+Use
+```sh
+python3 ordermyrepos.py
 ```
+or
+```
+python3 ordermyrepos.py -h
+```
+for more info.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
