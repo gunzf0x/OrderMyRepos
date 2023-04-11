@@ -702,10 +702,12 @@ def main() -> None:
         print_table(args, body_table, headers_table, max_allowed_length)
         # Save the file (if requested by the user)
         save_file(args, filtered_printable_data_table, max_allowed_length)
+    # If user provides no argument
     else:
         print(colors["L_BLUE"] + banner +'\n' + colors["RED"] + signature + '\n' + colors["NC"])
         parser.print_help()  # Display help message for invalid command
     return None
+
 
 if __name__ == "__main__":
     main()
